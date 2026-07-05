@@ -1,11 +1,3 @@
-"""Shared SlowAPI limiter instance.
-
-Import `limiter` wherever you need `@limiter.limit(...)` decorators.
-The app wires it into FastAPI state in main.py so the middleware can find it.
-
-Key function: real remote IP in production/development; a unique-per-request
-UUID in the test environment so tests never accidentally share rate-limit buckets.
-"""
 
 import uuid
 
