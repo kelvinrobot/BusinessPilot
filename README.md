@@ -257,10 +257,4 @@ Database migrations run automatically when the new container starts.
 | Multiple API replicas | Deploy to **ACK** (Kubernetes); the SQLite → Postgres switch is required first |
 | Secrets at scale | Store values in Alibaba Cloud **KMS** and inject via ACK Secret objects |
 
-## Known limitations (by design, for this v1)
 
-- **Research Agent** uses Qwen's own knowledge, not live web browsing -- it's
-  explicit in its output when it isn't confident about a current/live fact.
-- **Single Google account per user**, Gmail + Calendar only (no Outlook in v1).
-- **SQLite by default** -- fine for a single-instance deployment; see the Postgres
-  migration note above when you need to scale.
