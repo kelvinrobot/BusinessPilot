@@ -57,7 +57,7 @@ async def voice_ws(
     """
     await websocket.accept()
 
-    # ── Auth handshake ────────────────────────────────────────────────────────
+    #  Auth handshake 
     try:
         auth_data = await asyncio.wait_for(websocket.receive_json(), timeout=AUTH_TIMEOUT_SECONDS)
     except (asyncio.TimeoutError, Exception):
@@ -73,7 +73,7 @@ async def voice_ws(
         await websocket.close(code=4401)
         return
 
-    # ── Transcript loop ───────────────────────────────────────────────────────
+    #  Transcript loop 
     active_conversation_id = conversation_id
 
     try:
