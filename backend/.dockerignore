@@ -1,0 +1,36 @@
+# ── Python runtime artefacts ────────────────────────────────────────────────
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+*.egg-info/
+.eggs/
+
+# ── Virtual environment ───────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+
+# ── Secrets — MUST NOT enter the image ───────────────────────────────────────
+.env
+
+# ── Runtime data (mounted as a Docker volume at runtime) ─────────────────────
+storage/*.db
+storage/documents/*
+# keep the directory so mkdir -p is a no-op at startup
+!storage/documents/.gitkeep
+
+# ── Test artefacts ────────────────────────────────────────────────────────────
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+pytest.ini
+requirements-dev.txt
+
+# ── Editor / OS noise ─────────────────────────────────────────────────────────
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo

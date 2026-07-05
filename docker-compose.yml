@@ -1,0 +1,37 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - backend_storage:/app/storage
+    restart: unless-stopped
+    healthcheck:
+      # Use Python's stdlib so we don't need curl in the slim image.
+      test:
+        - "CMD"
+        - "python"
+        - "-c"
+        - "import urllib.request; urllib.request.urlopen('http://localhost:8000/health').read()"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s   # enough time for alembic upgrade head on a fresh DB
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy   # wait until /health responds, not just container start
+    restart: unless-stopped
+
+volumes:
+  backend_storage:

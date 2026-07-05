@@ -1,0 +1,37 @@
+# Production compose for the backend API only.
+#
+# The frontend is a separate application deployed independently
+# (e.g. Vercel, CDN, or its own container/instance).
+#
+# Usage on the server:
+#   export ACR_IMAGE=registry.cn-<region>.aliyuncs.com/<namespace>/businesspilot-api:latest
+#   docker compose -f docker-compose.prod.yml pull
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# All secrets must be provided via environment variables or an env_file that
+# is NOT committed to source control. Copy backend/.env.example to .env.prod
+# and fill in real values before deploying.
+
+services:
+  api:
+    image: ${ACR_IMAGE:?ACR_IMAGE must be set to the full ACR image path}
+    env_file:
+      - .env.prod          # copy from backend/.env.example and fill in values; never commit
+    ports:
+      - "8000:8000"
+    volumes:
+      - api_storage:/app/storage
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - "CMD"
+        - "python"
+        - "-c"
+        - "import urllib.request; urllib.request.urlopen('http://localhost:8000/health').read()"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s    # alembic upgrade head runs before uvicorn starts
+
+volumes:
+  api_storage:             # named volume so data persists across container restarts
