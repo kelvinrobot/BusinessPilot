@@ -1,18 +1,3 @@
-"""Centralised application configuration backed by pydantic-settings.
-
-Every setting has a documented default that works for local development.
-In production (ENVIRONMENT=production) critical fields are validated at
-startup — the process refuses to start if any contain placeholder values
-or are missing entirely.
-
-Generating required secrets
----------------------------
-SECRET_KEY:
-    python -c "import secrets; print(secrets.token_urlsafe(48))"
-
-ENCRYPTION_KEY (Fernet, used to encrypt Google OAuth tokens at rest):
-    python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
-"""
 
 from __future__ import annotations
 
@@ -50,48 +35,45 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # ── App ───────────────────────────────────────────────────────────────────
+    #  App
     app_name: str = "BusinessPilot AI"
     environment: Literal["development", "staging", "production", "test"] = "development"
     debug: bool = True
     api_v1_prefix: str = "/api/v1"
     frontend_origin: str = "http://localhost:3000"
 
-    # ── Security ──────────────────────────────────────────────────────────────
-    # Generate: python -c "import secrets; print(secrets.token_urlsafe(48))"
+
     secret_key: str = "change-me"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 14
-    # Fernet key encrypting Google OAuth tokens at rest.
-    # Generate: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+
     encryption_key: str = ""
 
-    # ── Database ─────────────────────────────────────────────────────────────
-    # SQLite for local dev. Set DATABASE_URL=postgresql+asyncpg://... for production.
+    #  Database 
+
     database_url: str = "sqlite+aiosqlite:///./storage/businesspilot.db"
 
-    # ── Qwen / DashScope ─────────────────────────────────────────────────────
+    #  Qwen / DashScope
     qwen_api_key: str = ""
-    # Native DashScope SDK endpoint (used for embeddings and dashscope SDK calls).
+
     dashscope_base_url: str = "https://dashscope-intl.aliyuncs.com/api/v1"
-    # OpenAI-compatible endpoint (used by the qwen chat client).
+
     dashscope_compat_url: str = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
-    # Models confirmed available on the DashScope international workspace:
+
     qwen_chat_model: str = "qwen-plus"
     qwen_embedding_model: str = "text-embedding-v3"
-    # STT/TTS: handled by the browser (Web Speech API / SpeechSynthesis).
-    # No server-side ASR or TTS models are accessible on this account.
 
-    # ── Google OAuth (Gmail + Calendar) ──────────────────────────────────────
+
+
     google_client_id: str = ""
     google_client_secret: str = ""
     google_redirect_uri: str = "http://localhost:8000/api/v1/integrations/google/callback"
 
-    # ── Storage ───────────────────────────────────────────────────────────────
+    #  Storage 
     storage_dir: str = "./storage/documents"
 
-    # ── Computed helpers ──────────────────────────────────────────────────────
+    #  Computed helpers
 
     @property
     def is_production(self) -> bool:
@@ -110,7 +92,7 @@ class Settings(BaseSettings):
         """Driver-only portion of DATABASE_URL, safe to log (no credentials)."""
         return self.database_url.split("://")[0]
 
-    # ── Field validators ──────────────────────────────────────────────────────
+    #  Field validators 
 
     @field_validator("encryption_key")
     @classmethod
@@ -131,7 +113,7 @@ class Settings(BaseSettings):
             )
         return v
 
-    # ── Production guard ──────────────────────────────────────────────────────
+    #  Production guard 
 
     @model_validator(mode="after")
     def production_checks(self) -> "Settings":
