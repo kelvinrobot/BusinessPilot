@@ -65,7 +65,7 @@ async def notifications_ws(websocket: WebSocket) -> None:
             await websocket.close(code=4401)
             return
 
-    # ── Register and hold open ─────────────────────────────────────────────
+    #  Register and hold open 
     notification_manager.register(user_id, websocket)
     try:
         while True:
