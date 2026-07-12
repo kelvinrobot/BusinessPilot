@@ -1,7 +1,7 @@
 import { clearTokens, getAccessToken, getRefreshToken, setTokens } from "./auth";
 import type { TokenPair } from "./types";
 
-export const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://47.84.198.26:8000";
+export const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://businesspilot-api.duckdns.org";
 
 export class ApiError extends Error {
   status: number;
