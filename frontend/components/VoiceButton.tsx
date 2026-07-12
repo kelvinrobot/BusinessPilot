@@ -65,12 +65,15 @@ declare global {
 export function VoiceButton({ conversationId, onPartial, onFinal, onReply }: VoiceButtonProps) {
   const [recording, setRecording] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const activeRef = useRef(false); // stable ref for closures
 
   function stopSpeaking() {
-    window.speechSynthesis.cancel();
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
     setSpeaking(false);
   }
 
@@ -85,7 +88,7 @@ export function VoiceButton({ conversationId, onPartial, onFinal, onReply }: Voi
     setRecording(false);
   }
 
-  async function start() {
+  function start() {
     const token = getAccessToken();
     if (!token) return;
 
@@ -95,51 +98,12 @@ export function VoiceButton({ conversationId, onPartial, onFinal, onReply }: Voi
       return;
     }
 
-    // Open WebSocket. Token is sent as the first message (not in the URL)
-    // so it is never captured by server access logs or browser history.
-    const wsPath = conversationId
-      ? `/api/v1/voice/ws?conversation_id=${encodeURIComponent(conversationId)}`
-      : "/api/v1/voice/ws";
-    const socket = new WebSocket(wsUrl(wsPath));
-    socketRef.current = socket;
+    setError(null);
 
-    socket.onmessage = (event) => {
-      const payload = JSON.parse(event.data as string);
-      if (payload.type === "reply_text") {
-        onReply?.({
-          text: payload.text,
-          conversation_id: payload.conversation_id,
-          documents: payload.documents ?? [],
-          pending_approvals: payload.pending_approvals ?? [],
-        });
-        // Speak the reply with the browser's built-in TTS.
-        setSpeaking(true);
-        const utterance = new SpeechSynthesisUtterance(payload.text);
-        utterance.onend = () => setSpeaking(false);
-        utterance.onerror = () => setSpeaking(false);
-        window.speechSynthesis.speak(utterance);
-      }
-    };
-
-    socket.onclose = () => {
-      activeRef.current = false;
-      setRecording(false);
-    };
-
-    // Wait for the socket to open, then send the auth token as the first message.
-    await new Promise<void>((resolve) => {
-      if (socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({ type: "auth", token }));
-        resolve();
-        return;
-      }
-      socket.onopen = () => {
-        socket.send(JSON.stringify({ type: "auth", token }));
-        resolve();
-      };
-      setTimeout(resolve, 3000);
-    });
-
+    // Start recognition immediately — it's a purely browser-native feature
+    // (Chrome/Edge's own speech engine) and must not be gated behind the
+    // backend WebSocket below, which is only needed to relay the transcript
+    // and receive a spoken reply.
     const recognition = new SR();
     recognition.continuous = true;
     recognition.interimResults = true;
@@ -153,8 +117,8 @@ export function VoiceButton({ conversationId, onPartial, onFinal, onReply }: Voi
         const transcript = result[0].transcript;
         if (result.isFinal) {
           onFinal?.(transcript);
-          if (socket.readyState === WebSocket.OPEN && transcript.trim()) {
-            socket.send(JSON.stringify({ type: "transcript", text: transcript.trim() }));
+          if (socketRef.current?.readyState === WebSocket.OPEN && transcript.trim()) {
+            socketRef.current.send(JSON.stringify({ type: "transcript", text: transcript.trim() }));
           }
         } else {
           onPartial?.(transcript);
@@ -163,6 +127,17 @@ export function VoiceButton({ conversationId, onPartial, onFinal, onReply }: Voi
     };
 
     recognition.onerror = (event) => {
+      // Fatal errors (permission denied, no mic, insecure context) will not
+      // resolve on retry — stop instead of silently looping forever.
+      if (event.error === "not-allowed" || event.error === "service-not-allowed" || event.error === "audio-capture") {
+        setError(
+          event.error === "audio-capture"
+            ? "No microphone was found."
+            : "Microphone access was blocked. Allow microphone permission for this site and try again.",
+        );
+        stop();
+        return;
+      }
       if (event.error !== "aborted" && event.error !== "no-speech") {
         console.error("Speech recognition error:", event.error);
       }
@@ -175,6 +150,48 @@ export function VoiceButton({ conversationId, onPartial, onFinal, onReply }: Voi
 
     recognition.start();
     setRecording(true);
+
+    // Open the voice WebSocket in parallel. Token is sent as the first
+    // message (not in the URL) so it is never captured by server access
+    // logs or browser history.
+    const wsPath = conversationId
+      ? `/api/v1/voice/ws?conversation_id=${encodeURIComponent(conversationId)}`
+      : "/api/v1/voice/ws";
+    const socket = new WebSocket(wsUrl(wsPath));
+    socketRef.current = socket;
+
+    socket.onopen = () => {
+      socket.send(JSON.stringify({ type: "auth", token }));
+    };
+
+    socket.onmessage = (event) => {
+      const payload = JSON.parse(event.data as string);
+      if (payload.type === "reply_text") {
+        onReply?.({
+          text: payload.text,
+          conversation_id: payload.conversation_id,
+          documents: payload.documents ?? [],
+          pending_approvals: payload.pending_approvals ?? [],
+        });
+        // Speak the reply with the browser's built-in TTS.
+        if (typeof window !== "undefined" && "speechSynthesis" in window) {
+          setSpeaking(true);
+          const utterance = new SpeechSynthesisUtterance(payload.text);
+          utterance.onend = () => setSpeaking(false);
+          utterance.onerror = () => setSpeaking(false);
+          window.speechSynthesis.speak(utterance);
+        }
+      }
+    };
+
+    socket.onerror = () => {
+      console.error("Voice WebSocket failed to connect");
+      setError("Couldn't reach the voice service — you can still talk, but replies won't be read aloud.");
+    };
+
+    socket.onclose = () => {
+      if (socketRef.current === socket) socketRef.current = null;
+    };
   }
 
   return (
@@ -198,6 +215,7 @@ export function VoiceButton({ conversationId, onPartial, onFinal, onReply }: Voi
           Stop speaking
         </button>
       )}
+      {error && <p className="text-xs text-red-600">{error}</p>}
     </div>
   );
 }
