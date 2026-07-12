@@ -2,7 +2,6 @@ import os
 
 import certifi
 
-
 os.environ.setdefault("SSL_CERT_FILE", certifi.where())
 os.environ.setdefault("REQUESTS_CA_BUNDLE", certifi.where())
 
@@ -28,6 +27,9 @@ logger = get_logger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # DEBUG: Print the frontend origin exactly as loaded from settings
+    print("FRONTEND_ORIGIN =", repr(settings.frontend_origin))
+
     logger.info(
         "startup",
         environment=settings.environment,
@@ -36,6 +38,7 @@ async def lifespan(app: FastAPI):
         google_oauth=settings.google_oauth_configured,
         qwen_ready=bool(settings.qwen_api_key),
     )
+
     start_scheduler()
     yield
     stop_scheduler()
@@ -63,7 +66,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 _SECURITY_HEADERS = {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
@@ -81,12 +83,18 @@ async def add_security_headers(request: Request, call_next):
 
 @app.exception_handler(AppError)
 async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
-    return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.message},
+    )
 
 
 @app.get("/health", tags=["health"])
 async def health() -> dict[str, str]:
-    return {"status": "ok", "app": settings.app_name}
+    return {
+        "status": "ok",
+        "app": settings.app_name,
+    }
 
 
 app.include_router(api_router, prefix=settings.api_v1_prefix)
