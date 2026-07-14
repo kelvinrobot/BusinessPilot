@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" font-family="'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#64748b" />
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb" />
+    </marker>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="900" fill="url(#bg)"/>
+
+  <text x="600" y="50" text-anchor="middle" fill="#f8fafc" font-size="28" font-weight="700">BusinessPilot AI — Production Architecture</text>
+  <text x="600" y="76" text-anchor="middle" fill="#94a3b8" font-size="14">Voice + chat executive assistant, powered by Qwen Cloud</text>
+
+  <!-- User -->
+  <rect x="500" y="110" width="200" height="60" rx="10" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
+  <text x="600" y="145" text-anchor="middle" fill="#f1f5f9" font-size="16" font-weight="600">User</text>
+  <text x="600" y="162" text-anchor="middle" fill="#94a3b8" font-size="11">Browser · voice or text</text>
+
+  <line x1="600" y1="170" x2="600" y2="205" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Vercel / Next.js -->
+  <rect x="440" y="208" width="320" height="70" rx="10" fill="#111827" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="600" y="238" text-anchor="middle" fill="#f8fafc" font-size="16" font-weight="600">Next.js Frontend</text>
+  <text x="600" y="256" text-anchor="middle" fill="#7dd3fc" font-size="11">Vercel · App Router · TypeScript</text>
+  <text x="600" y="270" text-anchor="middle" fill="#64748b" font-size="10">REST (fetch) + WebSocket (voice / notifications)</text>
+
+  <line x1="600" y1="278" x2="600" y2="313" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="618" y="300" fill="#64748b" font-size="10">HTTPS (TLS via Let's Encrypt)</text>
+
+  <!-- Alibaba ECS box -->
+  <rect x="230" y="316" width="740" height="330" rx="14" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="252" y="340" fill="#fbbf24" font-size="13" font-weight="700">ALIBABA CLOUD ECS (Docker host)</text>
+
+  <!-- Nginx -->
+  <rect x="470" y="352" width="260" height="56" rx="8" fill="#1f2937" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="600" y="376" text-anchor="middle" fill="#fde68a" font-size="14" font-weight="600">Nginx Reverse Proxy</text>
+  <text x="600" y="392" text-anchor="middle" fill="#94a3b8" font-size="10">HTTPS termination · Let's Encrypt · DuckDNS</text>
+
+  <line x1="600" y1="408" x2="600" y2="438" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- FastAPI container -->
+  <rect x="410" y="440" width="380" height="90" rx="10" fill="#0b3b2e" stroke="#34d399" stroke-width="1.5"/>
+  <text x="600" y="468" text-anchor="middle" fill="#d1fae5" font-size="16" font-weight="700">FastAPI Backend (Docker container)</text>
+  <text x="600" y="486" text-anchor="middle" fill="#6ee7b7" font-size="11">Multi-agent orchestrator · async SQLAlchemy 2.0</text>
+  <text x="600" y="502" text-anchor="middle" fill="#6ee7b7" font-size="11">Planner → Specialists → Reviewer, shared by chat + voice</text>
+  <text x="600" y="518" text-anchor="middle" fill="#94a3b8" font-size="10">JWT auth · Fernet-encrypted OAuth tokens · rate limiting</text>
+
+  <!-- Downstream services row -->
+  <!-- Qwen Cloud -->
+  <rect x="250" y="562" width="190" height="66" rx="10" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.5"/>
+  <text x="345" y="588" text-anchor="middle" fill="#e0e7ff" font-size="13" font-weight="600">Qwen Cloud</text>
+  <text x="345" y="604" text-anchor="middle" fill="#a5b4fc" font-size="10">DashScope API</text>
+  <text x="345" y="618" text-anchor="middle" fill="#a5b4fc" font-size="10">qwen-plus · text-embedding-v3</text>
+
+  <!-- Google APIs -->
+  <rect x="460" y="562" width="180" height="66" rx="10" fill="#1e1b4b" stroke="#f472b6" stroke-width="1.5"/>
+  <text x="550" y="588" text-anchor="middle" fill="#fce7f3" font-size="13" font-weight="600">Google APIs</text>
+  <text x="550" y="604" text-anchor="middle" fill="#f9a8d4" font-size="10">Gmail · Calendar</text>
+  <text x="550" y="618" text-anchor="middle" fill="#f9a8d4" font-size="10">OAuth 2.0</text>
+
+  <!-- SQLite -->
+  <rect x="660" y="562" width="150" height="66" rx="10" fill="#1e1b4b" stroke="#facc15" stroke-width="1.5"/>
+  <text x="735" y="588" text-anchor="middle" fill="#fef9c3" font-size="13" font-weight="600">SQLite</text>
+  <text x="735" y="604" text-anchor="middle" fill="#fde047" font-size="10">Postgres-ready</text>
+  <text x="735" y="618" text-anchor="middle" fill="#fde047" font-size="10">via DATABASE_URL</text>
+
+  <!-- Scheduler -->
+  <rect x="820" y="562" width="130" height="66" rx="10" fill="#1e1b4b" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="885" y="588" text-anchor="middle" fill="#e0f2fe" font-size="13" font-weight="600">Scheduler</text>
+  <text x="885" y="604" text-anchor="middle" fill="#7dd3fc" font-size="10">APScheduler</text>
+  <text x="885" y="618" text-anchor="middle" fill="#7dd3fc" font-size="10">meeting reminders</text>
+
+  <!-- connectors from FastAPI to services -->
+  <line x1="500" y1="530" x2="345" y2="560" stroke="#818cf8" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <line x1="560" y1="530" x2="550" y2="560" stroke="#f472b6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <line x1="660" y1="530" x2="735" y2="560" stroke="#facc15" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <line x1="720" y1="530" x2="885" y2="560" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+  <!-- WebSocket note -->
+  <rect x="820" y="440" width="150" height="90" rx="10" fill="#1f2937" stroke="#64748b" stroke-width="1.5"/>
+  <text x="895" y="464" text-anchor="middle" fill="#f1f5f9" font-size="13" font-weight="600">WebSocket</text>
+  <text x="895" y="482" text-anchor="middle" fill="#94a3b8" font-size="10">/voice/ws</text>
+  <text x="895" y="498" text-anchor="middle" fill="#94a3b8" font-size="10">/notifications/ws</text>
+  <text x="895" y="514" text-anchor="middle" fill="#94a3b8" font-size="10">token-first-message auth</text>
+  <line x1="820" y1="480" x2="790" y2="480" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Vercel label -->
+  <rect x="230" y="680" width="230" height="60" rx="10" fill="none" stroke="#38bdf8" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="345" y="705" text-anchor="middle" fill="#7dd3fc" font-size="12" font-weight="700">VERCEL</text>
+  <text x="345" y="722" text-anchor="middle" fill="#94a3b8" font-size="10">Frontend hosting + global CDN</text>
+
+  <!-- Human approval note -->
+  <rect x="700" y="680" width="270" height="76" rx="10" fill="none" stroke="#f43f5e" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text x="835" y="702" text-anchor="middle" fill="#fda4af" font-size="12" font-weight="700">HUMAN-IN-THE-LOOP GATE</text>
+  <text x="835" y="720" text-anchor="middle" fill="#94a3b8" font-size="10">Email sends &amp; calendar events are</text>
+  <text x="835" y="734" text-anchor="middle" fill="#94a3b8" font-size="10">written as pending_approval only —</text>
+  <text x="835" y="748" text-anchor="middle" fill="#94a3b8" font-size="10">never sent without explicit user approval</text>
+
+  <text x="600" y="820" text-anchor="middle" fill="#475569" font-size="11">Text chat and voice share one pipeline: Orchestrator → Planner → Specialist Agents → Reviewer → Memory</text>
+  <text x="600" y="840" text-anchor="middle" fill="#475569" font-size="11">Approval gating is structural, not prompted: side-effecting actions only ever run from an explicit /approve endpoint</text>
+</svg>
