@@ -40,20 +40,23 @@ function DocumentsContent() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Documents</h1>
+      <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">Documents</h1>
       <p className="mt-1 text-slate-500">Real, downloadable business documents your assistant has created.</p>
 
-      <form onSubmit={handleGenerate} className="mt-6 flex gap-3 rounded-xl border border-slate-200 bg-white p-4">
+      <form
+        onSubmit={handleGenerate}
+        className="mt-6 flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row"
+      >
         <input
           value={instruction}
           onChange={(e) => setInstruction(e.target.value)}
           placeholder="e.g. Create a competitor analysis for my bakery"
-          className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+          className="min-w-0 flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-300"
         />
         <button
           type="submit"
           disabled={generating}
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+          className="rounded-md bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1 sm:py-2"
         >
           {generating ? "Generating..." : "Generate"}
         </button>
@@ -67,9 +70,9 @@ function DocumentsContent() {
             onClick={() =>
               downloadAndSave(`/api/v1/documents/${doc.id}/download`, `${doc.title}.${doc.file_format}`)
             }
-            className="rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition-shadow hover:shadow-md"
+            className="rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
           >
-            <p className="font-medium text-slate-900">{doc.title}</p>
+            <p className="break-words font-medium text-slate-900">{doc.title}</p>
             <p className="mt-1 text-xs uppercase tracking-wide text-slate-400">
               {doc.doc_type.replace(/_/g, " ")} · {doc.file_format}
             </p>

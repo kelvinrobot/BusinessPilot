@@ -60,7 +60,7 @@ function CalendarContent() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Calendar</h1>
+      <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">Calendar</h1>
       <p className="mt-1 text-slate-500">
         Meetings your Calendar Agent proposed. Nothing is added to your real calendar until you approve it.
       </p>
@@ -70,32 +70,38 @@ function CalendarContent() {
         {events.map((event) => (
           <div key={event.id} className="rounded-xl border border-slate-200 bg-white p-5">
             <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="font-medium text-slate-900">{event.title}</p>
+              <div className="min-w-0 flex-1">
+                <p className="break-words font-medium text-slate-900">{event.title}</p>
                 <p className="text-xs text-slate-400">{formatRange(event.start_time, event.end_time)}</p>
               </div>
-              <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${STATUS_STYLES[event.status] || ""}`}>
+              <span
+                className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${STATUS_STYLES[event.status] || ""}`}
+              >
                 {event.status.replace(/_/g, " ")}
               </span>
             </div>
-            {event.description && <p className="mt-3 text-sm text-slate-600">{event.description}</p>}
+            {event.description && (
+              <p className="mt-3 break-words text-sm text-slate-600">{event.description}</p>
+            )}
             {event.attendees.length > 0 && (
-              <p className="mt-2 text-xs text-slate-400">Attendees: {event.attendees.join(", ")}</p>
+              <p className="mt-2 break-words text-xs text-slate-400">
+                Attendees: {event.attendees.join(", ")}
+              </p>
             )}
 
             {event.status === "pending_approval" && (
-              <div className="mt-4 flex gap-2">
+              <div className="mt-4 flex flex-wrap gap-2">
                 <button
                   onClick={() => approve(event.id)}
                   disabled={busyId === event.id}
-                  className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                  className="rounded-md bg-slate-900 px-3 py-2 text-xs font-medium text-white hover:bg-slate-800 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
                 >
                   Approve &amp; schedule
                 </button>
                 <button
                   onClick={() => reject(event.id)}
                   disabled={busyId === event.id}
-                  className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                  className="rounded-md border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
                 >
                   Reject
                 </button>

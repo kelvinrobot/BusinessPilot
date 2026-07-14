@@ -195,11 +195,11 @@ export function VoiceButton({ conversationId, onPartial, onFinal, onReply }: Voi
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-wrap items-center gap-3">
       <button
         type="button"
         onClick={() => (recording ? stop() : start())}
-        className={`flex h-14 w-14 items-center justify-center rounded-full text-2xl shadow-md transition-colors ${
+        className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-2xl shadow-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1 ${
           recording ? "bg-red-500 text-white" : "bg-slate-900 text-white hover:bg-slate-800"
         }`}
         aria-label={recording ? "Stop voice" : "Start voice"}
@@ -210,12 +210,12 @@ export function VoiceButton({ conversationId, onPartial, onFinal, onReply }: Voi
         <button
           type="button"
           onClick={stopSpeaking}
-          className="text-xs text-slate-500 underline hover:text-slate-700"
+          className="rounded px-1 py-2 text-xs text-slate-500 underline hover:text-slate-700"
         >
           Stop speaking
         </button>
       )}
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="min-w-0 basis-full text-xs text-red-600 sm:basis-auto">{error}</p>}
     </div>
   );
 }

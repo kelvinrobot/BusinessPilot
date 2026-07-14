@@ -40,7 +40,7 @@ function DashboardContent() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">
+      <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">
         Welcome back{user?.full_name ? `, ${user.full_name.split(" ")[0]}` : ""}.
       </h1>
       <p className="mt-1 text-slate-500">Here&apos;s what&apos;s happening with your business.</p>

@@ -75,7 +75,7 @@ function SettingsContent() {
   return (
     <div className="max-w-2xl space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Settings</h1>
+        <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">Settings</h1>
         <p className="mt-1 text-slate-500">Manage your profile, integrations, and what BusinessPilot remembers.</p>
       </div>
 
@@ -106,11 +106,13 @@ function SettingsContent() {
         {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
         <div className="mt-3">
           {googleStatus?.connected ? (
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-green-700">Connected{googleStatus.account_email ? ` as ${googleStatus.account_email}` : ""}</span>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="min-w-0 break-words text-sm text-green-700">
+                Connected{googleStatus.account_email ? ` as ${googleStatus.account_email}` : ""}
+              </span>
               <button
                 onClick={disconnectGoogle}
-                className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                className="shrink-0 rounded-md border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
               >
                 Disconnect
               </button>
@@ -119,7 +121,7 @@ function SettingsContent() {
             <button
               onClick={connectGoogle}
               disabled={connecting}
-              className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+              className="rounded-md bg-slate-900 px-3 py-2 text-xs font-medium text-white hover:bg-slate-800 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
             >
               {connecting ? "Redirecting..." : "Connect Google account"}
             </button>
@@ -130,30 +132,32 @@ function SettingsContent() {
       <section className="rounded-xl border border-slate-200 bg-white p-5">
         <h2 className="text-sm font-semibold text-slate-700">Your timezone</h2>
         <p className="mt-1 text-sm text-slate-500">
-          Used by the Calendar Agent to resolve dates like "tomorrow at 2 PM" correctly.
+          Used by the Calendar Agent to resolve dates like &quot;tomorrow at 2 PM&quot; correctly.
         </p>
-        <div className="mt-3 flex items-center gap-2">
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
           <input
             value={timezoneInput}
             onChange={(e) => { setTimezoneInput(e.target.value); setTzSaved(false); }}
             placeholder="e.g. Africa/Lagos"
-            className="flex-1 rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
+            className="min-w-0 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-300 sm:flex-1 sm:py-1.5"
           />
-          <button
-            type="button"
-            onClick={() => setTimezoneInput(Intl.DateTimeFormat().resolvedOptions().timeZone)}
-            className="rounded-md border border-slate-300 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50"
-          >
-            Auto-detect
-          </button>
-          <button
-            type="button"
-            onClick={saveTimezone}
-            disabled={tzSaving}
-            className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-800 disabled:opacity-50"
-          >
-            {tzSaving ? "Saving…" : "Save"}
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setTimezoneInput(Intl.DateTimeFormat().resolvedOptions().timeZone)}
+              className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-xs text-slate-600 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1 sm:flex-none sm:py-1.5"
+            >
+              Auto-detect
+            </button>
+            <button
+              type="button"
+              onClick={saveTimezone}
+              disabled={tzSaving}
+              className="flex-1 rounded-md bg-slate-900 px-3 py-2 text-xs font-medium text-white hover:bg-slate-800 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1 sm:flex-none sm:py-1.5"
+            >
+              {tzSaving ? "Saving…" : "Save"}
+            </button>
+          </div>
         </div>
         {tzSaved && <p className="mt-2 text-xs text-green-600">Timezone saved.</p>}
       </section>
@@ -166,11 +170,14 @@ function SettingsContent() {
         <div className="mt-3 space-y-2">
           {memory.map((item) => (
             <div key={item.id} className="flex items-start justify-between gap-3 rounded-md bg-slate-50 px-3 py-2">
-              <div>
-                <p className="text-sm text-slate-700">{item.content}</p>
+              <div className="min-w-0 flex-1">
+                <p className="break-words text-sm text-slate-700">{item.content}</p>
                 <p className="text-xs text-slate-400">{item.category}</p>
               </div>
-              <button onClick={() => deleteMemoryItem(item.id)} className="text-xs text-slate-400 hover:text-red-600">
+              <button
+                onClick={() => deleteMemoryItem(item.id)}
+                className="shrink-0 rounded px-2 py-2 text-xs text-slate-400 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
+              >
                 Forget
               </button>
             </div>

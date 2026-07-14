@@ -15,6 +15,6 @@ export default function Home() {
   }, [loading, user, router]);
 
   return (
-    <div className="flex h-screen items-center justify-center text-slate-500">Loading...</div>
+    <div className="flex min-h-dvh items-center justify-center text-slate-500">Loading...</div>
   );
 }

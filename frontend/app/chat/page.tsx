@@ -29,6 +29,7 @@ function ChatContent() {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [partialCaption, setPartialCaption] = useState("");
+  const [historyOpen, setHistoryOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -43,12 +44,14 @@ function ChatContent() {
     const detail = await api.get<ConversationDetail>(`/api/v1/chat/conversations/${id}`);
     setConversationId(detail.id);
     setMessages(detail.messages.map((m: MessageRead) => ({ role: m.role, content: m.content })));
+    setHistoryOpen(false);
   }
 
   function startNewChat() {
     setConversationId(null);
     setMessages([]);
     setPartialCaption("");
+    setHistoryOpen(false);
   }
 
   async function sendMessage() {
@@ -86,11 +89,12 @@ function ChatContent() {
   }
 
   return (
-    <div className="flex h-full gap-6">
-      <aside className="w-56 flex-shrink-0 overflow-y-auto border-r border-slate-200 pr-3">
+    <div className="flex h-full min-h-0 gap-6">
+      {/* Desktop / laptop / ultrawide: persistent conversation list */}
+      <aside className="hidden lg:flex lg:w-56 lg:flex-shrink-0 lg:flex-col lg:overflow-y-auto lg:border-r lg:border-slate-200 lg:pr-3">
         <button
           onClick={startNewChat}
-          className="mb-3 w-full rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
+          className="mb-3 w-full rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
         >
           + New chat
         </button>
@@ -109,7 +113,65 @@ function ChatContent() {
         </div>
       </aside>
 
-      <div className="flex flex-1 flex-col">
+      {/* Mobile / tablet: history slide-out drawer */}
+      {historyOpen && (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <div
+            className="absolute inset-0 bg-slate-900/40"
+            onClick={() => setHistoryOpen(false)}
+            aria-hidden="true"
+          />
+          <aside className="absolute inset-y-0 left-0 flex w-72 max-w-[80vw] flex-col bg-white p-4 shadow-xl">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-sm font-semibold text-slate-800">Conversations</span>
+              <button
+                type="button"
+                onClick={() => setHistoryOpen(false)}
+                aria-label="Close conversation history"
+                className="flex h-11 w-11 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="flex-1 space-y-1 overflow-y-auto">
+              {conversations.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => loadConversation(c.id)}
+                  className={`block w-full truncate rounded-md px-2 py-2 text-left text-sm ${
+                    c.id === conversationId ? "bg-slate-100 font-medium text-slate-900" : "text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  {c.title}
+                </button>
+              ))}
+              {conversations.length === 0 && (
+                <p className="px-2 py-1.5 text-sm text-slate-400">No conversations yet.</p>
+              )}
+            </div>
+          </aside>
+        </div>
+      )}
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="mb-3 flex items-center gap-2 lg:hidden">
+          <button
+            onClick={startNewChat}
+            className="flex-1 rounded-md bg-slate-900 px-3 py-2.5 text-sm font-medium text-white hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
+          >
+            + New chat
+          </button>
+          <button
+            type="button"
+            onClick={() => setHistoryOpen(true)}
+            aria-label="Open conversation history"
+            aria-expanded={historyOpen}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-slate-200 text-slate-600 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
+          >
+            🕘
+          </button>
+        </div>
+
         <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto pb-4">
           {messages.length === 0 && (
             <p className="mt-10 text-center text-sm text-slate-400">
@@ -119,7 +181,7 @@ function ChatContent() {
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
-                className={`max-w-2xl rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap ${
+                className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap break-words sm:max-w-xl lg:max-w-2xl ${
                   m.role === "user" ? "bg-slate-900 text-white" : "bg-white border border-slate-200 text-slate-800"
                 }`}
               >
@@ -132,7 +194,7 @@ function ChatContent() {
                         onClick={() =>
                           d.download_url && downloadAndSave(d.download_url, `${d.title || "document"}`)
                         }
-                        className="block text-left text-xs font-medium text-blue-600 hover:underline"
+                        className="block break-words rounded py-1 text-left text-xs font-medium text-blue-600 hover:underline"
                       >
                         📄 Download: {d.title}
                       </button>
@@ -149,14 +211,14 @@ function ChatContent() {
           ))}
           {partialCaption && (
             <div className="flex justify-end">
-              <div className="max-w-2xl rounded-2xl bg-slate-200 px-4 py-2.5 text-sm italic text-slate-500">
+              <div className="max-w-[85%] break-words rounded-2xl bg-slate-200 px-4 py-2.5 text-sm italic text-slate-500 sm:max-w-xl lg:max-w-2xl">
                 {partialCaption}
               </div>
             </div>
           )}
         </div>
 
-        <div className="flex items-end gap-3 border-t border-slate-200 pt-4">
+        <div className="flex items-end gap-2 border-t border-slate-200 pt-4 sm:gap-3">
           <VoiceButton
             conversationId={conversationId}
             onPartial={(text) => setPartialCaption(text)}
@@ -188,12 +250,12 @@ function ChatContent() {
             }}
             placeholder="Type a message..."
             rows={1}
-            className="flex-1 resize-none rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-slate-500 focus:outline-none"
+            className="min-w-0 flex-1 resize-none rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-300"
           />
           <button
             onClick={sendMessage}
             disabled={sending}
-            className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+            className="shrink-0 rounded-xl bg-slate-900 px-3 py-3 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1 sm:px-4"
           >
             Send
           </button>

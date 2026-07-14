@@ -158,7 +158,7 @@ function EmailCard({
       {isPending ? (
         <BodyTextarea value={edits.body} onChange={(v) => update("body", v)} />
       ) : (
-        <p className="mt-3 whitespace-pre-wrap text-sm text-slate-600">{draft.body}</p>
+        <p className="mt-3 whitespace-pre-wrap break-words text-sm text-slate-600">{draft.body}</p>
       )}
 
       {/* Save indicator */}
@@ -170,18 +170,18 @@ function EmailCard({
 
       {/* Action buttons */}
       {isPending && (
-        <div className="mt-4 flex gap-2">
+        <div className="mt-4 flex flex-wrap gap-2">
           <button
             onClick={approve}
             disabled={busy}
-            className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+            className="rounded-md bg-slate-900 px-3 py-2 text-xs font-medium text-white hover:bg-slate-800 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
           >
             Approve &amp; send
           </button>
           <button
             onClick={reject}
             disabled={busy}
-            className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+            className="rounded-md border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
           >
             Reject
           </button>
@@ -205,7 +205,7 @@ function EmailContent() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Email</h1>
+      <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">Email</h1>
       <p className="mt-1 text-slate-500">
         Drafts your Email Agent prepared. Edit them freely before sending — nothing leaves until you approve.
       </p>
